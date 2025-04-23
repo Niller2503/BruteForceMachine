@@ -9,6 +9,7 @@ namespace BruteForcePassword
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Brute Force Adgangskode Program (Tester forskellige længder)");
+            Console.ResetColor();
             Console.WriteLine("Indtast den adgangskode, der skal findes:");
             string targetPassword = Console.ReadLine();
             Console.WriteLine("\nStarter brute force (fra 1 til 10 tegn)...");
@@ -40,20 +41,32 @@ namespace BruteForcePassword
 
         static bool BruteForce(string target, int minLength, int maxLength)
         {
-            char[] charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+=-`~[]{};':\",./<>?".ToCharArray();
+            char[] charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?".ToCharArray();
 
             for (int length = minLength; length <= maxLength; length++)
             {
                 int[] indices = new int[length];
+                long totalLengthCombinations = (long)Math.Pow(charset.Length, length);
+                long lengthCounter = 0;
+                long outputInterval = Math.Max(1000, totalLengthCombinations / 100); // Opdater ca. 100 gange pr. længde
 
                 while (true)
                 {
                     string currentAttempt = GeneratePassword(charset, indices);
-                    Console.WriteLine($"Længde {length}, Forsøg: {currentAttempt}");
+                    lengthCounter++;
 
                     if (currentAttempt == target)
                     {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"\nFundet adgangskode: {currentAttempt}");
+                        Console.ResetColor();
                         return true;
+                    }
+
+                    if (lengthCounter % outputInterval == 0)
+                    {
+                        double progress = (double)lengthCounter / totalLengthCombinations * 100;
+                        Console.WriteLine($"Længde: {length}, Fremskridt: {progress:F2}%");
                     }
 
                     // Opdater indices for næste forsøg
